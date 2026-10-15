@@ -1,0 +1,2 @@
+{ "name": "feito-pc-agent", "version": "0.1.0", "private": true, "main": "agent.js",
+  "scripts": { "start": "node agent.js" }, "engines": { "node": ">=20" }, "dependencies": { "ws": "^8.18.0" } }
