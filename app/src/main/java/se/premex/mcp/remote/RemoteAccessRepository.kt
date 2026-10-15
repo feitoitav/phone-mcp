@@ -17,18 +17,20 @@ data class RemoteAccessConfig(
     val enabled: Boolean = false,
     val deviceId: String? = null,
     val deviceSecret: String? = null,
+    val relayUrlOverride: String? = null,
 ) {
     val registered: Boolean get() = deviceId != null && deviceSecret != null
 
-    /** The PhoneMCP relay. Not user-configurable — the hosted relay is the product. */
-    val relayUrl: String get() = RELAY_URL
+    /** Feito relay. Override is stored on device; default is our host, never phonemcp.ai. */
+    val relayUrl: String
+        get() = relayUrlOverride?.trim()?.trimEnd('/')?.takeIf { it.isNotEmpty() } ?: RELAY_URL
 
     companion object {
-        const val RELAY_URL = "https://phonemcp.ai"
+        const val RELAY_URL = "https://relay.feitoitav.com"
     }
 }
 
-/** Persists the Remote access (phonemcp.ai tunnel) settings. */
+/** Persists the Remote access (Feito Azure tunnel) settings. */
 @Singleton
 class RemoteAccessRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -38,6 +40,7 @@ class RemoteAccessRepository @Inject constructor(
         private val ENABLED = booleanPreferencesKey("enabled")
         private val DEVICE_ID = stringPreferencesKey("device_id")
         private val DEVICE_SECRET = stringPreferencesKey("device_secret")
+        private val RELAY_URL_OVERRIDE = stringPreferencesKey("relay_url")
     }
 
     fun config(): Flow<RemoteAccessConfig> = context.dataStore.data.map { preferences ->
@@ -45,11 +48,20 @@ class RemoteAccessRepository @Inject constructor(
             enabled = preferences[ENABLED] ?: false,
             deviceId = preferences[DEVICE_ID],
             deviceSecret = preferences[DEVICE_SECRET],
+            relayUrlOverride = preferences[RELAY_URL_OVERRIDE],
         )
     }
 
     suspend fun setEnabled(enabled: Boolean) {
         context.dataStore.edit { it[ENABLED] = enabled }
+    }
+
+    suspend fun setRelayUrl(relayUrl: String?) {
+        context.dataStore.edit { prefs ->
+            val trimmed = relayUrl?.trim()?.trimEnd('/')
+            if (trimmed.isNullOrEmpty()) prefs.remove(RELAY_URL_OVERRIDE)
+            else prefs[RELAY_URL_OVERRIDE] = trimmed
+        }
     }
 
     suspend fun saveDevice(deviceId: String, deviceSecret: String) {
