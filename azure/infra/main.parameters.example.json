@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": { "value": "<REGION-FROM-FRANK>" },
+    "image": { "value": "<REGISTRY>/feito-mcp-relay:<TAG>" },
+    "keyVaultName": { "value": "<KEYVAULT-FROM-FRANK>" },
+    "customHostname": { "value": "<HOSTNAME-FROM-FRANK>" },
+    "certificateId": { "value": "" }
+  }
+}

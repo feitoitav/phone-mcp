@@ -26,6 +26,7 @@ data class RemoteAccessConfig(
         get() = relayUrlOverride?.trim()?.trimEnd('/')?.takeIf { it.isNotEmpty() } ?: RELAY_URL
 
     companion object {
+        // PLACEHOLDER: hostname not yet confirmed by Frank. Per-device override: DataStore relay_url.
         const val RELAY_URL = "https://relay.feitoitav.com"
     }
 }
